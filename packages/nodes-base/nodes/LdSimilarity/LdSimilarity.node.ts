@@ -32,6 +32,33 @@ export class LdSimilarity implements INodeType {
 		properties: [
 			// Node properties which the user gets displayed and
 			// can change on the node.
+
+
+			{
+				displayName: 'Type of Similarity',
+				name: 'similarityType',
+				type: 'options',
+				options: [
+					{
+						name: 'First type',
+						value: 'type1',
+					},
+					{
+						name: 'Second type',
+						value: 'type2',
+					},
+					{
+						name: 'Third type',
+						value: 'type3',
+					},
+				],
+				default: 'type1', // The initially selected option
+				description: 'Type of algorithm to calculate the similarity',
+			},
+
+
+
+
 		],
 	};
 

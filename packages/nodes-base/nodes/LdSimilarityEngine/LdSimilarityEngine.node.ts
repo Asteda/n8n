@@ -32,6 +32,22 @@ export class LdSimilarityEngine implements INodeType {
 		properties: [
 			// Node properties which the user gets displayed and
 			// can change on the node.
+
+			{
+				displayName: 'Number of threads',
+				name: 'nbThreads',
+				type: 'number',
+				required: true,
+				typeOptions: {
+					maxValue: 10,
+					minValue: 1,
+					numberStepSize: 1,
+				},
+				default: 1,
+				description: 'How many threads to calculate the similarity',
+			},
+
+
 		],
 	};
 

@@ -32,6 +32,25 @@ export class LdSimilarityResourcesInput implements INodeType {
 		properties: [
 			// Node properties which the user gets displayed and
 			// can change on the node.
+
+			{
+				displayName: 'URL Resource 1',
+				name: 'url1',
+				type: 'string',
+				required: true,
+				default:'',
+				description:'URL of the first resource',
+			},
+
+			{
+				displayName: 'URL Resource 2',
+				name: 'url2',
+				type: 'string',
+				required: true,
+				default:'',
+				description:'URL of the second resource',
+			},
+
 		],
 	};
 
