@@ -13,16 +13,16 @@ import {
 	OptionsWithUri,
 } from 'request';
 
-export class CalculSimilarite implements INodeType {
+export class LdSimilarityResourcesInput implements INodeType {
 	description: INodeTypeDescription = {
-		displayName: 'CalculSimilarite',
-		name: 'calculSimilarite',
-		icon: 'file:CalculSimilarite.svg',
+		displayName: 'LdSimilarityResourcesInput',
+		name: 'ldSimilarityResourcesInput',
+		icon: 'file:engrenage.svg',
 		group: ['transform'],
 		version: 1,
-		description: 'Calculer similarité sémantique',
+		description: 'Consume LdSimilarityResourcesInput API',
 		defaults: {
-			name: 'CalculSimilarite',
+			name: 'LdSimilarityResourcesInput',
 			color: '#1A82e2',
 		},
 		inputs: ['main'],
@@ -36,6 +36,6 @@ export class CalculSimilarite implements INodeType {
 	};
 
 	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
-	return [[]];
-}
+		return [[]];
+	}
 }
