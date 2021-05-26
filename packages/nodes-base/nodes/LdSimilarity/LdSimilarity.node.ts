@@ -35,25 +35,74 @@ export class LdSimilarity implements INodeType {
 
 
 			{
-				displayName: 'Type of Similarity',
-				name: 'similarityType',
+				displayName: 'Type of measure',
+				name: 'measureType',
 				type: 'options',
-				options: [
+				options: [ // les types sont parmi le tableau ici https://github.com/FouadKom/lds/blob/master/doc/Similarity_Measures_Configuration_Parameters.md
 					{
-						name: 'First type',
-						value: 'type1',
+						name: 'LDSD_d',
+						value: 'LDSD_d',
 					},
 					{
-						name: 'Second type',
-						value: 'type2',
+						name: 'LDSD_dw',
+						value: 'LDSD_dw',
 					},
 					{
-						name: 'Third type',
-						value: 'type3',
+						name: 'LDSD_i',
+						value: 'LDSD_i',
 					},
+					{
+						name: 'LDSD_iw',
+						value: 'LDSD_iw',
+					},
+					{
+						name: 'LDSD_cw',
+						value: 'LDSD_cw',
+					},
+					{
+						name: 'TLDSD',
+						value: 'TLDSD',
+					},
+					{
+						name: 'WLDSD',
+						value: 'WLDSD',
+					},
+					{
+						name: 'Resim',
+						value: 'Resim',
+					},
+					{
+						name: 'TResim',
+						value: 'TResim',
+					},
+					{
+						name: 'WResim',
+						value: 'WResim',
+					},
+					{
+						name: 'WTResim',
+						value: 'WTResim',
+					},
+					{
+						name: 'PICSS',
+						value: 'PICSS',
+					},
+					{
+						name: 'EPICS',
+						value: 'EPICS',
+					},
+					{
+						name: 'LODS (SimP submeasure)',
+						value: 'LODS-SimP',
+					},
+					{
+						name: 'LODS (SimI submeasure)',
+						value: 'LODS-SimI',
+					},
+
 				],
-				default: 'type1', // The initially selected option
-				description: 'Type of algorithm to calculate the similarity',
+				default: 'Resim', // The initially selected option
+				description: 'Type of measure',
 			},
 
 
