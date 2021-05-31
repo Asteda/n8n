@@ -39,8 +39,8 @@ export class LdSimilarity implements INodeType {
 				type: 'options',
 				options: [
 					{
-						name: 'Files',
-						value: 'files',
+						name: 'File',
+						value: 'file',
 					},
 					{
 						name: 'URIs',
@@ -79,6 +79,24 @@ export class LdSimilarity implements INodeType {
 					show: {
 						resource: [
 							'uris',
+						]	,
+					},
+				},
+			},
+
+			{
+				displayName: 'JSON data',
+				name: 'jsondata',
+				type: 'json',
+				required: true,
+				default:'',
+				description:'Indicate the JSON data to calculate the similarity. You can use, for example, the output' +
+					'of the Google Sheet node. The format of these JSON data must be ' +
+					'<pre>[ { "resource1": "..." , "resource2": "..." },  ... ]</pre>.',
+				displayOptions: {
+					show: {
+						resource: [
+							'file',
 						]	,
 					},
 				},
@@ -237,8 +255,22 @@ export class LdSimilarity implements INodeType {
 	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
 		//let responseData;
 
+		const resource = this.getNodeParameter('resource', 0) as string;
 		const measureType = this.getNodeParameter('measureType', 0) as string;
 		const numberOfThreads = this.getNodeParameter('nbThreads', 0) as number;
+
+		if(resource === 'files') {
+			// code pour les sources multiples
+		}
+		else if (resource === 'uris') {
+			const uri1 = this.getNodeParameter('url1', 0) as string;
+			const uri2 = this.getNodeParameter('url2', 0) as string;
+			return [this.helpers.returnJsonArray({
+				resource1: uri1,
+				resource2: uri2,
+				result : Math.random(),
+			})];
+		}
 
 		/*const options: OptionsWithUri = {
 			headers: {
@@ -262,7 +294,7 @@ export class LdSimilarity implements INodeType {
 		return [this.helpers.returnJsonArray({
 			resource1: measureType,
 			resource2: numberOfThreads,
-			result : '0.66442',
+			result : Math.random(),
 		})];
 
 
