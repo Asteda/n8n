@@ -49,7 +49,8 @@ export class LdSimilarity implements INodeType {
 				],
 				default: 'uris',
 				required: true,
-				description: 'Resource to consume',
+				description: 'Resource to consume. If you chose the File mode, you must place a node before this one,' +
+					' which gives some JSON data as Output.',
 			},
 
 			{
@@ -79,41 +80,6 @@ export class LdSimilarity implements INodeType {
 					show: {
 						resource: [
 							'uris',
-						]	,
-					},
-				},
-			},
-
-			{
-				displayName: 'JSON data',
-				name: 'jsondata',
-				type: 'json',
-				required: true,
-				default:'',
-				description:'Indicate the JSON data to calculate the similarity. You can use, for example, the output' +
-					'of the Google Sheet node. The format of these JSON data must be ' +
-					'<pre>[ { "resource1": "..." , "resource2": "..." },  ... ]</pre>.',
-				displayOptions: {
-					show: {
-						resource: [
-							'file',
-						]	,
-					},
-				},
-			},
-
-			{
-				displayName: 'SpreadSheet ID Input',
-				name: 'sheetIdInput',
-				type: 'string',
-				required: true,
-				default:'',
-				description:'ID of the Google Sheet document to get the resources (you can get it between' +
-					'"/d/" and "/edit" in the URL file)',
-				displayOptions: {
-					show: {
-						resource: [
-							'files',
 						]	,
 					},
 				},
@@ -238,17 +204,6 @@ export class LdSimilarity implements INodeType {
 				description: 'Type of measure',
 			},
 
-			{
-				displayName: 'SpreadSheet ID Output',
-				name: 'sheetIdOutput',
-				type: 'string',
-				required: true,
-				default:'',
-				description:'ID of the Google Sheet document to write the result (you can get it between' +
-					'"/d/" and "/edit" in the URL file) <br/> This file MUST have 3 columns : resource1, resource2, result.',
-			},
-
-
 		],
 	};
 
@@ -259,37 +214,68 @@ export class LdSimilarity implements INodeType {
 		const measureType = this.getNodeParameter('measureType', 0) as string;
 		const numberOfThreads = this.getNodeParameter('nbThreads', 0) as number;
 
-		if(resource === 'files') {
+		if(resource === 'file') {
 			// code pour les sources multiples
+
+			const items = this.getInputData();
+
+			const returnData: INodeExecutionData[] = [];
+			const length = items.length as unknown as number;
+			let item: INodeExecutionData;
+
+			for (let itemIndex = 0; itemIndex < length; itemIndex++) {
+				item = items[itemIndex];
+
+
+
+				const newItem: INodeExecutionData = {
+					json: {
+						resource1: item.json.resource1,
+						resource2: item.json.resource2,
+						result: Math.random(),
+					},
+				};
+
+				returnData.push(newItem);
+			}
+
+			return this.prepareOutputData(returnData);
+/*
+			let indexInputData = 0;
+			let returnData = [];
+			let inputData = this.getInputData(indexInputData);
+			while(this.getInputData(indexInputData) !== []) {
+				inputData = this.getInputData(indexInputData);
+
+					returnData.push(
+						{
+							resource1: inputData[0],
+							resource2: inputData[1],
+							result: Math.random(),
+						},
+					);
+
+				indexInputData++;
+			}
+			return [this.helpers.returnJsonArray(returnData)];
+*/
 		}
 		else if (resource === 'uris') {
 			const uri1 = this.getNodeParameter('url1', 0) as string;
 			const uri2 = this.getNodeParameter('url2', 0) as string;
-			return [this.helpers.returnJsonArray({
-				resource1: uri1,
-				resource2: uri2,
-				result : Math.random(),
+
+			const jsonData = [
+
+
+			];
+
+			return [this.helpers.returnJsonArray(
+				{
+					resource1: uri1,
+					resource2: uri2,
+					result : Math.random(),
 			})];
 		}
-
-		/*const options: OptionsWithUri = {
-			headers: {
-				'Accept': 'application/json',
-				//'Authorization': `Bearer ${credentials.apiKey}`,
-			},
-			method: 'PUT',
-			body: {
-
-			},
-			uri: `https://api.sendgrid.com/v3/marketing/contacts`,
-			json: true,
-		};*/
-
-		//responseData = await this.helpers.request(options);
-
-
-
-		//return [this.helpers.returnJsonArray(responseData)];
 
 		return [this.helpers.returnJsonArray({
 			resource1: measureType,
