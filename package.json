@@ -23,7 +23,8 @@
     "run-script-os": "^1.0.7"
   },
   "engines": {
-    "node": "14.x"
+    "node": "14.x",
+    "npm": "6.x"
   },
   "postcss": {}
 }
