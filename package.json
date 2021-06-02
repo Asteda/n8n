@@ -15,7 +15,11 @@
     "tslint": "lerna exec npm run tslint",
     "watch": "lerna run --parallel watch",
     "webhook": "./packages/cli/bin/n8n webhook",
-    "worker": "./packages/cli/bin/n8n worker"
+    "worker": "./packages/cli/bin/n8n worker",
+    "tsc": "tsc",
+    "postinstall": "npm run tsc"
+
+
   },
   "devDependencies": {
     "lerna": "^3.13.1",
