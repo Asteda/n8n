@@ -16,8 +16,9 @@
     "watch": "lerna run --parallel watch",
     "webhook": "./packages/cli/bin/n8n webhook",
     "worker": "./packages/cli/bin/n8n worker",
-    "tsc": "./node_modules/typescript/bin/tsc",
-    "heroku-postbuild": "echo Skip builds on Heroku"
+    "tsc": "./node_modules/typescript/bin/tsc"//,
+    //"heroku-postbuild": "echo Skip builds on Heroku"
+
 
   },
   "devDependencies": {
