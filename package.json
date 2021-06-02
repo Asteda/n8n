@@ -16,7 +16,7 @@
     "watch": "lerna run --parallel watch",
     "webhook": "./packages/cli/bin/n8n webhook",
     "worker": "./packages/cli/bin/n8n worker",
-    "tsc": "tsc",
+    "tsc": "./node_modules/typescript/bin/tsc",
     "postinstall": "npm run tsc"
 
 
