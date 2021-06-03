@@ -204,6 +204,28 @@ export class LdSimilarity implements INodeType {
 				description: 'Type of measure',
 			},
 
+			{
+				displayName: 'Output format for numbers',
+				name: 'format_numbers',
+				type: 'options',
+				options: [
+					{
+						name: 'Numeric',
+						value: 'numeric',
+					},
+					{
+						name: 'String',
+						value: 'string',
+					},
+				],
+				default: 'numeric',
+				description: 'The output format for the result value of similarity score. <br />' +
+					'String format can be preferred for the Google Sheets output (Google Sheets doesn\'t <br />' +
+					'report the value when it is zero, and this option forces Google Sheets node to <br />' +
+					'write the zero value), whereas numeric format can be preferred for the CSV output, <br />' +
+					'for example.',
+			},
+
 		],
 	};
 
@@ -213,11 +235,13 @@ export class LdSimilarity implements INodeType {
 		const resource = this.getNodeParameter('resource', 0) as string;
 		const measureType = this.getNodeParameter('measureType', 0) as string;
 		const numberOfThreads = this.getNodeParameter('nbThreads', 0) as number;
+		const numberFormat = this.getNodeParameter('format_numbers', 0) as string;
 
 		if(resource === 'file') {
 			// code pour les sources multiples
 
 			const items = this.getInputData();
+
 
 			const returnData: INodeExecutionData[] = [];
 			const length = items.length as unknown as number;
@@ -226,13 +250,20 @@ export class LdSimilarity implements INodeType {
 			for (let itemIndex = 0; itemIndex < length; itemIndex++) {
 				item = items[itemIndex];
 
-
+				let score;
+				if(numberFormat === 'string') {
+					score = Math.random().toString() as string;
+				}
+				else {
+					score = Math.random() as number;
+				}
 
 				const newItem: INodeExecutionData = {
 					json: {
 						resource1: item.json.resource1,
 						resource2: item.json.resource2,
-						result: (Math.random()).toString(),
+						//result: (Math.random()).toString(),
+						result: score,
 					},
 				};
 
@@ -262,12 +293,21 @@ export class LdSimilarity implements INodeType {
 
 			const responseData = await this.helpers.request(options);
 
+			let score;
+			if(numberFormat === 'string') {
+				score = responseData.score.toString() as string;
+			}
+			else {
+				score = responseData.score as number;
+			}
+
 
 			return [this.helpers.returnJsonArray(
 				{
 					resource1: uri1,
 					resource2: uri2,
-					result : responseData.score.toString(),
+					//result : responseData.score.toString(),
+					result : score,
 			})];
 		}
 
