@@ -232,7 +232,7 @@ export class LdSimilarity implements INodeType {
 					json: {
 						resource1: item.json.resource1,
 						resource2: item.json.resource2,
-						result: 1,
+						result: (Math.random()).toString(),
 					},
 				};
 
@@ -267,7 +267,7 @@ export class LdSimilarity implements INodeType {
 				{
 					resource1: uri1,
 					resource2: uri2,
-					result : responseData.score,
+					result : responseData.score.toString(),
 			})];
 		}
 
