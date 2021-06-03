@@ -232,7 +232,7 @@ export class LdSimilarity implements INodeType {
 					json: {
 						resource1: item.json.resource1,
 						resource2: item.json.resource2,
-						result: Math.random(),
+						result: 1,
 					},
 				};
 
@@ -241,46 +241,40 @@ export class LdSimilarity implements INodeType {
 
 			return this.prepareOutputData(returnData);
 /*
-			let indexInputData = 0;
-			let returnData = [];
-			let inputData = this.getInputData(indexInputData);
-			while(this.getInputData(indexInputData) !== []) {
-				inputData = this.getInputData(indexInputData);
-
-					returnData.push(
-						{
-							resource1: inputData[0],
-							resource2: inputData[1],
-							result: Math.random(),
-						},
-					);
-
-				indexInputData++;
-			}
-			return [this.helpers.returnJsonArray(returnData)];
 */
 		}
 		else if (resource === 'uris') {
 			const uri1 = this.getNodeParameter('url1', 0) as string;
 			const uri2 = this.getNodeParameter('url2', 0) as string;
 
-			const jsonData = [
+			const url = 'https://wysiwym-api.herokuapp.com/similarity?name=' + measureType + '&r1=' + uri1 + '&r2=' + uri2;
 
+			const options: OptionsWithUri = {
+				headers: {
+					'Accept': 'application/json',
+				},
+				method: 'GET',
+				body: {
+				},
+				uri: url,
+				json: true,
+			};
 
-			];
+			const responseData = await this.helpers.request(options);
+
 
 			return [this.helpers.returnJsonArray(
 				{
 					resource1: uri1,
 					resource2: uri2,
-					result : Math.random(),
+					result : responseData.score,
 			})];
 		}
 
 		return [this.helpers.returnJsonArray({
 			resource1: measureType,
 			resource2: numberOfThreads,
-			result : Math.random(),
+			result : 1,
 		})];
 
 
