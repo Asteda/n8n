@@ -17,7 +17,7 @@ export class LdDatasetMain implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'LdDatasetMain',
 		name: 'ldDatasetMain',
-		icon: 'file:engrenage.svg',
+		icon: 'file:gear-red.svg',
 		group: ['transform'],
 		version: 1,
 		description: 'Consume LdSimilarity API',
@@ -95,7 +95,7 @@ export class LdDatasetMain implements INodeType {
 
 	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
 
-
+		console.log('Exécution du noeud datasetmain');
 		return [this.helpers.returnJsonArray({
 
 			xsd: this.getNodeParameter('xsd', 0),

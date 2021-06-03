@@ -25,7 +25,8 @@ export class LdSimilarity implements INodeType {
 			name: 'LdSimilarity',
 			color: '#1A82e2',
 		},
-		inputs: ['main'],
+		inputs: ['main', 'main'],
+		inputNames: ['DatasetMain', 'Input File'],
 		outputs: ['main'],
 		credentials: [
 		],
@@ -230,7 +231,9 @@ export class LdSimilarity implements INodeType {
 	};
 
 	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
-		//let responseData;
+
+		console.log('Exécution du noeud LdSimilarity');
+
 
 		const resource = this.getNodeParameter('resource', 0) as string;
 		const measureType = this.getNodeParameter('measureType', 0) as string;
@@ -240,7 +243,35 @@ export class LdSimilarity implements INodeType {
 		if(resource === 'file') {
 			// code pour les sources multiples
 
-			const items = this.getInputData();
+			// ici nous attendons deux entrées dans getInputData
+			// l'index 0 peut être les url et l'index 1 les datasetmain, et inversement, comment les différencier ?
+			let input1;
+			let input2;
+			let length1;
+			let length2;
+
+
+			try { // dataset
+				input1 = this.getInputData(0);
+				length1 = input1.length as unknown as number;
+				console.log('index 0 : ' + input1.toString());
+			}
+			catch(error) {
+				throw new Error('Dataset parameters are missing. Maybe you forgot to add a LdDatasetMain node before this one.');
+			}
+			try { // input file
+				input2 = this.getInputData(1);
+				length2 = input2.length as unknown as number;
+				console.log('index 1 : ' + input2.toString());
+			}
+			catch(error) {
+				throw new Error('Input File data are missing. Maybe you forgot to add a node before this one.');
+			}
+
+			const items = input2;
+			const parameters = input1;
+
+			//console.log(parameters[0].json); // afficher les paramètres dataset reçus dans la console
 
 
 			const returnData: INodeExecutionData[] = [];
@@ -271,10 +302,12 @@ export class LdSimilarity implements INodeType {
 			}
 
 			return this.prepareOutputData(returnData);
-/*
-*/
+
 		}
 		else if (resource === 'uris') {
+			// ici nous n'attentons qu'une entrée en inputData
+			const items = this.getInputData(0); // paramètres datasetmain
+
 			const uri1 = this.getNodeParameter('url1', 0) as string;
 			const uri2 = this.getNodeParameter('url2', 0) as string;
 
