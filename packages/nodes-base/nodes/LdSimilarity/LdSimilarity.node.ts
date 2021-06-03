@@ -245,31 +245,24 @@ export class LdSimilarity implements INodeType {
 
 			// ici nous attendons deux entrées dans getInputData
 			// l'index 0 peut être les url et l'index 1 les datasetmain, et inversement, comment les différencier ?
-			let input1;
-			let input2;
-			let length1;
-			let length2;
+			let items;
+			let parameters;
 
 
 			try { // dataset
-				input1 = this.getInputData(0);
-				length1 = input1.length as unknown as number;
-				console.log('index 0 : ' + input1.toString());
+				items = this.getInputData(0);
+				console.log('index 0 : ' + items.toString());
 			}
 			catch(error) {
 				throw new Error('Dataset parameters are missing. Maybe you forgot to add a LdDatasetMain node before this one.');
 			}
 			try { // input file
-				input2 = this.getInputData(1);
-				length2 = input2.length as unknown as number;
-				console.log('index 1 : ' + input2.toString());
+				parameters = this.getInputData(1);
+				console.log('index 1 : ' + parameters.toString());
 			}
 			catch(error) {
 				throw new Error('Input File data are missing. Maybe you forgot to add a node before this one.');
 			}
-
-			const items = input2;
-			const parameters = input1;
 
 			//console.log(parameters[0].json); // afficher les paramètres dataset reçus dans la console
 
@@ -306,7 +299,18 @@ export class LdSimilarity implements INodeType {
 		}
 		else if (resource === 'uris') {
 			// ici nous n'attentons qu'une entrée en inputData
-			const items = this.getInputData(0); // paramètres datasetmain
+
+			let parameters;
+			try {
+				parameters = this.getInputData(0); // paramètres datasetmain
+			}
+			catch(error) {
+				throw new Error('Dataset parameters are missing. Maybe you forgot to add a LdDatasetMain node before this one.');
+			}
+			if(parameters.length === 0 || typeof parameters[0].json.xsd === 'undefined') {
+				throw new Error('Dataset parameters invalid. Maybe you forgot to add a LdDatasetMain node before this one.');
+			}
+			//console.log(parameters[0].json); // afficher les paramètres dataset reçus dans la console
 
 			const uri1 = this.getNodeParameter('url1', 0) as string;
 			const uri2 = this.getNodeParameter('url2', 0) as string;
