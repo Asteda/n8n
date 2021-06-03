@@ -411,6 +411,7 @@
       "dist/nodes/Keap/Keap.node.js",
       "dist/nodes/Keap/KeapTrigger.node.js",
       "dist/nodes/Kitemaker/Kitemaker.node.js",
+      "dist/nodes/LdDatasetMain/LdDatasetMain.node.js",
       "dist/nodes/LdSimilarity/LdSimilarity.node.js",
       "dist/nodes/Lemlist/Lemlist.node.js",
       "dist/nodes/Lemlist/LemlistTrigger.node.js",
