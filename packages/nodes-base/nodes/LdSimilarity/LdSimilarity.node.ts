@@ -1,17 +1,8 @@
-import {
-	IExecuteFunctions,
-} from 'n8n-core';
+import {IExecuteFunctions,} from 'n8n-core';
 
-import {
-	IDataObject,
-	INodeExecutionData,
-	INodeType,
-	INodeTypeDescription,
-} from 'n8n-workflow';
+import {INodeExecutionData, INodeType, INodeTypeDescription,} from 'n8n-workflow';
 
-import {
-	OptionsWithUri,
-} from 'request';
+import {OptionsWithUri,} from 'request';
 
 export class LdSimilarity implements INodeType {
 	description: INodeTypeDescription = {
@@ -232,13 +223,26 @@ export class LdSimilarity implements INodeType {
 
 	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
 
-		console.log('Exécution du noeud LdSimilarity');
+		console.log('Exécution du noeud LdSimilarity **');
 
 
 		const resource = this.getNodeParameter('resource', 0) as string;
 		const measureType = this.getNodeParameter('measureType', 0) as string;
 		const numberOfThreads = this.getNodeParameter('nbThreads', 0) as number;
 		const numberFormat = this.getNodeParameter('format_numbers', 0) as string;
+
+		function buildOptions(res1: string, res2: string, measureType: string): OptionsWithUri {
+			const url = 'https://wysiwym-api.herokuapp.com/similarity?name=' + measureType + '&r1=' + res1 + '&r2=' + res2;
+			return {
+				headers: {
+					'Accept': 'application/json',
+				},
+				method: 'GET',
+				body: {},
+				uri: url,
+				json: true,
+			};
+		}
 
 
 		/* ===  partie pour les sources multiples (fichier contenant des couples d'URIs) === */
@@ -270,12 +274,32 @@ export class LdSimilarity implements INodeType {
 			for (let itemIndex = 0; itemIndex < length; itemIndex++) {
 				item = items[itemIndex];
 
-				const score = (numberFormat === 'string') ? Math.random().toString() as string : Math.random() as number;
+				const uri1 = item.json.resource1 as string;
+				const uri2 = item.json.resource2 as string;
+/*
+				const url = 'https://wysiwym-api.herokuapp.com/similarity?name=' + measureType + '&r1=' + uri1 + '&r2=' + uri2;
+
+				const options: OptionsWithUri = {
+					headers: {
+						'Accept': 'application/json',
+					},
+					method: 'GET',
+					body: {
+					},
+					uri: url,
+					json: true,
+				};
+*/
+				const options = buildOptions(uri1, uri2, measureType);
+				const responseData = await this.helpers.request(options);
+
+
+				const score = (numberFormat === 'string') ? responseData.score.toString() as string : responseData.score as number;
 
 				const newItem: INodeExecutionData = {
 					json: {
-						resource1: item.json.resource1,
-						resource2: item.json.resource2,
+						resource1: uri1,
+						resource2: uri2,
 						result: score,
 					},
 				};
@@ -307,7 +331,7 @@ export class LdSimilarity implements INodeType {
 
 			const uri1 = this.getNodeParameter('url1', 0) as string;
 			const uri2 = this.getNodeParameter('url2', 0) as string;
-
+/*
 			const url = 'https://wysiwym-api.herokuapp.com/similarity?name=' + measureType + '&r1=' + uri1 + '&r2=' + uri2;
 
 			const options: OptionsWithUri = {
@@ -320,7 +344,8 @@ export class LdSimilarity implements INodeType {
 				uri: url,
 				json: true,
 			};
-
+*/
+			const options = buildOptions(uri1, uri2, measureType);
 			const responseData = await this.helpers.request(options);
 
 			const score = (numberFormat === 'string') ? responseData.score.toString() as string : responseData.score as number;
@@ -343,4 +368,5 @@ export class LdSimilarity implements INodeType {
 
 
 	}
+
 }
