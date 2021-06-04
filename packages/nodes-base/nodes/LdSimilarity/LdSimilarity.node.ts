@@ -276,20 +276,7 @@ export class LdSimilarity implements INodeType {
 
 				const uri1 = item.json.resource1 as string;
 				const uri2 = item.json.resource2 as string;
-/*
-				const url = 'https://wysiwym-api.herokuapp.com/similarity?name=' + measureType + '&r1=' + uri1 + '&r2=' + uri2;
 
-				const options: OptionsWithUri = {
-					headers: {
-						'Accept': 'application/json',
-					},
-					method: 'GET',
-					body: {
-					},
-					uri: url,
-					json: true,
-				};
-*/
 				const options = buildOptions(uri1, uri2, measureType);
 				const responseData = await this.helpers.request(options);
 
@@ -331,20 +318,7 @@ export class LdSimilarity implements INodeType {
 
 			const uri1 = this.getNodeParameter('url1', 0) as string;
 			const uri2 = this.getNodeParameter('url2', 0) as string;
-/*
-			const url = 'https://wysiwym-api.herokuapp.com/similarity?name=' + measureType + '&r1=' + uri1 + '&r2=' + uri2;
 
-			const options: OptionsWithUri = {
-				headers: {
-					'Accept': 'application/json',
-				},
-				method: 'GET',
-				body: {
-				},
-				uri: url,
-				json: true,
-			};
-*/
 			const options = buildOptions(uri1, uri2, measureType);
 			const responseData = await this.helpers.request(options);
 
