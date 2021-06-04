@@ -250,15 +250,15 @@ export class LdSimilarity implements INodeType {
 
 
 			try { // dataset
-				items = this.getInputData(0);
-				console.log('index 0 : ' + items.toString());
+				parameters = this.getInputData(0);
+				console.log('index 0 : ' + parameters.toString());
 			}
 			catch(error) {
 				throw new Error('Dataset parameters are missing. Maybe you forgot to add a LdDatasetMain node before this one.');
 			}
 			try { // input file
-				parameters = this.getInputData(1);
-				console.log('index 1 : ' + parameters.toString());
+				items = this.getInputData(1);
+				console.log('index 1 : ' + items.toString());
 			}
 			catch(error) {
 				throw new Error('Input File data are missing. Maybe you forgot to add a node before this one.');
