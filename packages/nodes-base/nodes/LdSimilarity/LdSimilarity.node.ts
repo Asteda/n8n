@@ -240,32 +240,28 @@ export class LdSimilarity implements INodeType {
 		const numberOfThreads = this.getNodeParameter('nbThreads', 0) as number;
 		const numberFormat = this.getNodeParameter('format_numbers', 0) as string;
 
-		if(resource === 'file') {
-			// code pour les sources multiples
 
-			// ici nous attendons deux entrées dans getInputData
-			// l'index 0 peut être les url et l'index 1 les datasetmain, et inversement, comment les différencier ?
+		/* ===  partie pour les sources multiples (fichier contenant des couples d'URIs) === */
+
+		if(resource === 'file') {
+
+
 			let items;
 			let parameters;
 
-
-			try { // dataset
+			try { // dataset : parameters
 				parameters = this.getInputData(0);
-				console.log('index 0 : ' + parameters.toString());
 			}
 			catch(error) {
 				throw new Error('Dataset parameters are missing. Maybe you forgot to add a LdDatasetMain node before this one.');
 			}
-			try { // input file
+			try { // input file : items
 				items = this.getInputData(1);
-				console.log('index 1 : ' + items.toString());
 			}
 			catch(error) {
 				throw new Error('Input File data are missing. Maybe you forgot to add a node before this one.');
 			}
-
-			//console.log(parameters[0].json); // afficher les paramètres dataset reçus dans la console
-
+			// NB : si le dataset est manquant, les données iront dans la variable parameters, et le 2ème try/catch provoquera une erreur
 
 			const returnData: INodeExecutionData[] = [];
 			const length = items.length as unknown as number;
@@ -274,19 +270,12 @@ export class LdSimilarity implements INodeType {
 			for (let itemIndex = 0; itemIndex < length; itemIndex++) {
 				item = items[itemIndex];
 
-				let score;
-				if(numberFormat === 'string') {
-					score = Math.random().toString() as string;
-				}
-				else {
-					score = Math.random() as number;
-				}
+				const score = (numberFormat === 'string') ? Math.random().toString() as string : Math.random() as number;
 
 				const newItem: INodeExecutionData = {
 					json: {
 						resource1: item.json.resource1,
 						resource2: item.json.resource2,
-						//result: (Math.random()).toString(),
 						result: score,
 					},
 				};
@@ -297,7 +286,12 @@ export class LdSimilarity implements INodeType {
 			return this.prepareOutputData(returnData);
 
 		}
+
+
+		/* === partie pour les entrée en mode URIs === */
+
 		else if (resource === 'uris') {
+
 			// ici nous n'attentons qu'une entrée en inputData
 
 			let parameters;
@@ -310,7 +304,6 @@ export class LdSimilarity implements INodeType {
 			if(parameters.length === 0 || typeof parameters[0].json.xsd === 'undefined') {
 				throw new Error('Dataset parameters invalid. Maybe you forgot to add a LdDatasetMain node before this one.');
 			}
-			//console.log(parameters[0].json); // afficher les paramètres dataset reçus dans la console
 
 			const uri1 = this.getNodeParameter('url1', 0) as string;
 			const uri2 = this.getNodeParameter('url2', 0) as string;
@@ -330,23 +323,16 @@ export class LdSimilarity implements INodeType {
 
 			const responseData = await this.helpers.request(options);
 
-			let score;
-			if(numberFormat === 'string') {
-				score = responseData.score.toString() as string;
-			}
-			else {
-				score = responseData.score as number;
-			}
-
+			const score = (numberFormat === 'string') ? responseData.score.toString() as string : responseData.score as number;
 
 			return [this.helpers.returnJsonArray(
 				{
 					resource1: uri1,
 					resource2: uri2,
-					//result : responseData.score.toString(),
 					result : score,
 			})];
 		}
+
 
 		return [this.helpers.returnJsonArray({
 			resource1: measureType,
