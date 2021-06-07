@@ -78,6 +78,22 @@ export class LdSimilarity implements INodeType {
 			},
 
 			{
+				displayName: 'Benchmark',
+				name: 'benchmark',
+				type: 'boolean',
+				required: true,
+				default:'false',
+				description:'Turn on if you want to compare the results with the benchmarks.',
+				displayOptions: {
+					show: {
+						resource: [
+							'file',
+						]	,
+					},
+				},
+			},
+
+			{
 				displayName: 'Number of threads',
 				name: 'nbThreads',
 				type: 'number',
@@ -223,7 +239,7 @@ export class LdSimilarity implements INodeType {
 
 	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
 
-		console.log('Exécution du noeud LdSimilarity **');
+		console.log('Exécution du noeud LdSimilarity');
 
 
 		const resource = this.getNodeParameter('resource', 0) as string;
@@ -248,6 +264,9 @@ export class LdSimilarity implements INodeType {
 		/* ===  partie pour les sources multiples (fichier contenant des couples d'URIs) === */
 
 		if(resource === 'file') {
+			console.log('** en mode File');
+
+			const usesBenchmark = this.getNodeParameter('benchmark', 0) as boolean;
 
 
 			let items;
@@ -270,6 +289,8 @@ export class LdSimilarity implements INodeType {
 			const returnData: INodeExecutionData[] = [];
 			const length = items.length as unknown as number;
 			let item: INodeExecutionData;
+
+			console.log('** construction du résultat');
 
 			for (let itemIndex = 0; itemIndex < length; itemIndex++) {
 				item = items[itemIndex];
@@ -294,6 +315,22 @@ export class LdSimilarity implements INodeType {
 				returnData.push(newItem);
 			}
 
+
+			if(usesBenchmark === true) {
+				console.log('** utilisation du benchmark');
+				const correlationNumber = 0.5;
+				const correlation = (numberFormat === 'string') ? correlationNumber.toString() as string : correlationNumber as number;
+				const newItem: INodeExecutionData = {
+					json: {
+						resource1: 'Correlation',
+						resource2: '',
+						result: correlation,
+					},
+				};
+				returnData.push(newItem);
+			}
+			console.log('** fin du résultat');
+
 			return this.prepareOutputData(returnData);
 
 		}
@@ -302,6 +339,8 @@ export class LdSimilarity implements INodeType {
 		/* === partie pour les entrée en mode URIs === */
 
 		else if (resource === 'uris') {
+
+			console.log('** en mode URIs');
 
 			// ici nous n'attentons qu'une entrée en inputData
 
@@ -316,6 +355,8 @@ export class LdSimilarity implements INodeType {
 				throw new Error('Dataset parameters invalid. Maybe you forgot to add a LdDatasetMain node before this one.');
 			}
 
+			console.log('** construction du résultat');
+
 			const uri1 = this.getNodeParameter('url1', 0) as string;
 			const uri2 = this.getNodeParameter('url2', 0) as string;
 
@@ -323,6 +364,8 @@ export class LdSimilarity implements INodeType {
 			const responseData = await this.helpers.request(options);
 
 			const score = (numberFormat === 'string') ? responseData.score.toString() as string : responseData.score as number;
+
+			console.log('** fin du résultat');
 
 			return [this.helpers.returnJsonArray(
 				{

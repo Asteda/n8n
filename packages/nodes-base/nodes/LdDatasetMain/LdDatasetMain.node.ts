@@ -95,7 +95,7 @@ export class LdDatasetMain implements INodeType {
 
 	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
 
-		console.log('Exécution du noeud datasetmain');
+		console.log('Exécution du noeud LdDatasetMain');
 		return [this.helpers.returnJsonArray({
 
 			xsd: this.getNodeParameter('xsd', 0),
