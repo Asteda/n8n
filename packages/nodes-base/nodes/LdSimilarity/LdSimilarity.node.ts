@@ -35,23 +35,23 @@ export class LdSimilarity implements INodeType {
 						value: 'file',
 					},
 					{
-						name: 'URIs',
+						name: 'Couple of concepts',
 						value: 'uris',
 					},
 				],
 				default: 'uris',
 				required: true,
-				description: 'Resource to consume. If you chose the File mode, you must place a node before this one,' +
+				description: 'Type of entry. If you chose the File mode, you must place a node before this one,' +
 					' which gives some JSON data as Output.',
 			},
 
 			{
-				displayName: 'URL Resource 1',
+				displayName: 'Resource 1',
 				name: 'url1',
 				type: 'string',
 				required: true,
 				default:'',
-				description:'URL of the first resource',
+				description:'Name of the first concept',
 				displayOptions: {
 					show: {
 						resource: [
@@ -62,12 +62,12 @@ export class LdSimilarity implements INodeType {
 			},
 
 			{
-				displayName: 'URL Resource 2',
+				displayName: 'Resource 2',
 				name: 'url2',
 				type: 'string',
 				required: true,
 				default:'',
-				description:'URL of the second resource',
+				description:'Name of the second concept',
 				displayOptions: {
 					show: {
 						resource: [
@@ -105,30 +105,6 @@ export class LdSimilarity implements INodeType {
 				},
 				default: 1,
 				description: 'How many threads to calculate the similarity',
-			},
-
-			// lddata set = choix
-
-			{
-				displayName: 'DataSet Choice',
-				name: 'datasetChoice',
-				type: 'options',
-				options: [
-					{
-						name: 'DBPedia_en',
-						value: 'DBPedia_en',
-					},
-					{
-						name: 'DBPedia_fr',
-						value: 'DBPedia_fr',
-					},
-					{
-						name: 'DBPedia_it',
-						value: 'DBPedia_it',
-					},
-				],
-				default: 'DBPedia_en', // The initially selected option
-				description: 'The main dataset object for querying data',
 			},
 
 			// useindex bool
@@ -248,7 +224,10 @@ export class LdSimilarity implements INodeType {
 		const numberFormat = this.getNodeParameter('format_numbers', 0) as string;
 
 		function buildOptions(res1: string, res2: string, measureType: string): OptionsWithUri {
-			const url = 'https://wysiwym-api.herokuapp.com/similarity?name=' + measureType + '&r1=' + res1 + '&r2=' + res2;
+			const url = 'https://wysiwym-api.herokuapp.com/similarity?' +
+				'name=' + measureType +
+				'&r1=' + res1 +
+				'&r2=' + res2;
 			return {
 				headers: {
 					'Accept': 'application/json',

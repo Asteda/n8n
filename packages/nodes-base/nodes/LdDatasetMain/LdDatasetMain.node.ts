@@ -31,6 +31,31 @@ export class LdDatasetMain implements INodeType {
 		],
 		properties: [
 
+			// lddata set = choix
+
+			{
+				displayName: 'DataSet Choice',
+				name: 'datasetChoice',
+				type: 'options',
+				options: [
+					{
+						name: 'DBPedia_en',
+						value: 'DBPedia_en',
+					},
+					{
+						name: 'DBPedia_fr',
+						value: 'DBPedia_fr',
+					},
+					{
+						name: 'DBPedia_it',
+						value: 'DBPedia_it',
+					},
+				],
+				default: 'DBPedia_en', // The initially selected option
+				description: 'The main dataset object for querying data',
+			},
+
+
 			{
 				displayName: 'nsPrefixMap: xsd',
 				name: 'xsd',
@@ -88,6 +113,14 @@ export class LdDatasetMain implements INodeType {
 				default:'http://dbpedia.org',
 				description:'',
 			},
+			{
+				displayName: 'Base resource URL',
+				name: 'baseResourceURL',
+				type: 'string',
+				required: true,
+				default:'http://dbpedia.org/resource/',
+				description:'The URI prefixes.',
+			},
 
 
 		],
@@ -98,13 +131,23 @@ export class LdDatasetMain implements INodeType {
 		console.log('Exécution du noeud LdDatasetMain');
 		return [this.helpers.returnJsonArray({
 
-			xsd: this.getNodeParameter('xsd', 0),
-			rdfs: this.getNodeParameter('rdfs', 0),
-			dbpedia: this.getNodeParameter('dbpedia', 0),
-			dbpediaowl: this.getNodeParameter('dbpedia-owl', 0),
-			rdf: this.getNodeParameter('rdf', 0),
+			name: this.getNodeParameter('datasetChoice', 0),
+
+			prefixes: {
+				nsPrefixMap:
+					{
+						xsd: this.getNodeParameter('xsd', 0),
+						rdfs: this.getNodeParameter('rdfs', 0),
+						dbpedia: this.getNodeParameter('dbpedia', 0),
+						dbpediaowl: this.getNodeParameter('dbpedia-owl', 0),
+						rdf: this.getNodeParameter('rdf', 0),
+
+					},
+			},
+
 			link: this.getNodeParameter('link', 0),
 			defaultGraph: this.getNodeParameter('defaultGraph', 0),
+			baseResourceURL : this.getNodeParameter('baseResourceURL', 0),
 
 		})];
 
