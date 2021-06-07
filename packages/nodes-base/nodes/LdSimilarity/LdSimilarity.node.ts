@@ -239,6 +239,48 @@ export class LdSimilarity implements INodeType {
 			};
 		}
 
+		/**
+		 * Retourne les options pour la requête HTTP au service web LDS.
+		 * @param file true si les données sont sous forme de fichier ; false sinon (couple unique d'URL)
+		 * @param resources objet JSON contenant la liste des couples d'URL / le couple d'URL
+		 * @param dataset paramètres du noeud LdDatasetMain
+		 * @param options paramètres du noeud LdSimilarity
+		 */
+		function buildOptionsPOST(resources: object[], dataset: INodeExecutionData, options: object): OptionsWithUri {
+
+			let url = 'https://wysiwym-api.herokuapp.com/similarity?' ;
+			if(resources.length > 1) {
+				url += 'mode=multiple';
+			}
+			else {
+				// @ts-ignore
+				url += 'mode=simple&res1=' + resources[0]['resource1'] + '&res2=' + resources[0]['resource1'];
+			}
+
+			const bodyOptions = {
+				'LdDatasetMain': dataset.json,
+				'resources': resources,
+				'options': options,
+			} ;
+
+			const result = {
+				headers: {
+					'Accept': 'application/json',
+				},
+				method: 'POST',
+				body: bodyOptions,
+				uri: url,
+				json: true,
+			};
+
+			console.log(result);
+			console.log(bodyOptions);
+			console.log(resources);
+			console.log(bodyOptions['LdDatasetMain']);
+
+			return result;
+		}
+
 
 		/* ===  partie pour les sources multiples (fichier contenant des couples d'URIs) === */
 
@@ -271,6 +313,8 @@ export class LdSimilarity implements INodeType {
 
 			console.log('** construction du résultat');
 
+			const urisJSON = [];
+
 			for (let itemIndex = 0; itemIndex < length; itemIndex++) {
 				item = items[itemIndex];
 
@@ -283,6 +327,20 @@ export class LdSimilarity implements INodeType {
 
 				const score = (numberFormat === 'string') ? responseData.score.toString() as string : responseData.score as number;
 
+				if(usesBenchmark) {
+					urisJSON.push({
+						resource1: uri1,
+						resource2: uri2,
+						benchmark: item.json.benchmark,
+					});
+				}
+				else {
+					urisJSON.push({
+						resource1: uri1,
+						resource2: uri2,
+					});
+				}
+
 				const newItem: INodeExecutionData = {
 					json: {
 						resource1: uri1,
@@ -293,6 +351,17 @@ export class LdSimilarity implements INodeType {
 
 				returnData.push(newItem);
 			}
+
+
+			const optionsUI = {
+				benchmark: usesBenchmark,
+				threads: this.getNodeParameter('nbThreads', 0),
+				useIndex: this.getNodeParameter('useIndex', 0),
+				measureType: this.getNodeParameter('measureType', 0),
+			};
+
+
+			const optionsPOST = buildOptionsPOST(urisJSON, parameters[0], optionsUI);
 
 
 			if(usesBenchmark === true) {
@@ -330,7 +399,7 @@ export class LdSimilarity implements INodeType {
 			catch(error) {
 				throw new Error('Dataset parameters are missing. Maybe you forgot to add a LdDatasetMain node before this one.');
 			}
-			if(parameters.length === 0 || typeof parameters[0].json.xsd === 'undefined') {
+			if(parameters.length === 0 || typeof parameters[0].json.name === 'undefined') {
 				throw new Error('Dataset parameters invalid. Maybe you forgot to add a LdDatasetMain node before this one.');
 			}
 
@@ -339,8 +408,22 @@ export class LdSimilarity implements INodeType {
 			const uri1 = this.getNodeParameter('url1', 0) as string;
 			const uri2 = this.getNodeParameter('url2', 0) as string;
 
+			const urisJSON = [{
+				resource1: uri1,
+				resource2: uri2,
+			}];
+			const optionsUI = {
+				benchmark: false,
+				threads: this.getNodeParameter('nbThreads', 0),
+				useIndex: this.getNodeParameter('useIndex', 0),
+				measureType: this.getNodeParameter('measureType', 0),
+			};
+
+
 			const options = buildOptions(uri1, uri2, measureType);
+			const optionsPOST = buildOptionsPOST(urisJSON, parameters[0], optionsUI);
 			const responseData = await this.helpers.request(options);
+			//const responseData = await this.helpers.request(optionsPOST);
 
 			const score = (numberFormat === 'string') ? responseData.score.toString() as string : responseData.score as number;
 
