@@ -17,7 +17,7 @@ export class LdDatasetMain implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'LdDatasetMain',
 		name: 'ldDatasetMain',
-		icon: 'file:gear-red.svg',
+		icon: 'file:database-icon.svg',
 		group: ['transform'],
 		version: 1,
 		description: 'Consume LdSimilarity API',

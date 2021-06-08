@@ -8,7 +8,7 @@ export class LdSimilarity implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'LdSimilarity',
 		name: 'ldSimilarity',
-		icon: 'file:engrenage.svg',
+		icon: 'file:gear-icon.svg',
 		group: ['transform'],
 		version: 1,
 		description: 'Consume LdSimilarity API',
