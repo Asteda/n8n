@@ -94,6 +94,66 @@ export class LdSimilarity implements INodeType {
 			},
 
 			{
+				displayName: 'Benchmark Name',
+				name: 'benchmarkName',
+				type: 'options',
+				options: [
+					{
+						name: 'None',
+						value: 'none',
+					},
+					{
+						name: 'mc-30',
+						value: 'mc30',
+					},
+					{
+						name: 'rg-65',
+						value: 'rg65',
+					},
+					{
+						name: 'wordsim-353',
+						value: 'wordsim353',
+					},
+				],
+				displayOptions: {
+					show: {
+						benchmark: [
+							true,
+						],
+					},
+				},
+				default: 'none',
+				required: true,
+				description: 'Benchmark\'s name.',
+			},
+
+			{
+				displayName: 'Correlation Type',
+				name: 'correlationType',
+				type: 'options',
+				options: [
+					{
+						name: 'Spearman',
+						value: 'spearman',
+					},
+					{
+						name: 'Pearson',
+						value: 'pearson',
+					},
+				],
+				displayOptions: {
+					show: {
+						benchmark: [
+							true,
+						],
+					},
+				},
+				default: 'spearman',
+				required: true,
+				description: 'Type of correlation.',
+			},
+
+			{
 				displayName: 'Number of threads',
 				name: 'nbThreads',
 				type: 'number',
@@ -219,29 +279,19 @@ export class LdSimilarity implements INodeType {
 
 
 		const resource = this.getNodeParameter('resource', 0) as string;
-		const measureType = this.getNodeParameter('measureType', 0) as string;
-		const numberOfThreads = this.getNodeParameter('nbThreads', 0) as number;
 		const numberFormat = this.getNodeParameter('format_numbers', 0) as string;
 
-		function buildOptions(res1: string, res2: string, measureType: string): OptionsWithUri {
-			const url = 'https://wysiwym-api.herokuapp.com/similarity?' +
-				'name=' + measureType +
-				'&r1=' + res1 +
-				'&r2=' + res2;
-			return {
-				headers: {
-					'Accept': 'application/json',
-				},
-				method: 'GET',
-				body: {},
-				uri: url,
-				json: true,
-			};
-		}
+		const optionsUI = {
+			benchmark: false,
+			benchmarkName: '',
+			correlationType: '',
+			threads: this.getNodeParameter('nbThreads', 0),
+			useIndex: this.getNodeParameter('useIndex', 0),
+			measureType: this.getNodeParameter('measureType', 0),
+		};
 
 		/**
 		 * Retourne les options pour la requête HTTP au service web LDS.
-		 * @param file true si les données sont sous forme de fichier ; false sinon (couple unique d'URL)
 		 * @param resources objet JSON contenant la liste des couples d'URL / le couple d'URL
 		 * @param dataset paramètres du noeud LdDatasetMain
 		 * @param options paramètres du noeud LdSimilarity
@@ -263,7 +313,7 @@ export class LdSimilarity implements INodeType {
 				'options': options,
 			} ;
 
-			const result = {
+			return {
 				headers: {
 					'Accept': 'application/json',
 				},
@@ -272,13 +322,21 @@ export class LdSimilarity implements INodeType {
 				uri: url,
 				json: true,
 			};
+		}
 
-			console.log(result);
-			console.log(bodyOptions);
-			console.log(resources);
-			console.log(bodyOptions['LdDatasetMain']);
-
-			return result;
+		/**
+		 * Renvoie un tableau d'objets JSON où les scores ont été transformés en format string.
+		 * @param jsondata le tableau de données à transformer
+		 */
+		// tslint:disable-next-line:no-any
+		function setScoreToString(jsondata: any) {
+			for(let i=0; i<jsondata.length; i++) {
+				if(jsondata[i].hasOwnProperty('score')) {
+					// @ts-ignore
+					jsondata[i].score = jsondata[i].score.toString();
+				}
+			}
+			return jsondata;
 		}
 
 
@@ -287,46 +345,37 @@ export class LdSimilarity implements INodeType {
 		if(resource === 'file') {
 			console.log('** en mode File');
 
-			const usesBenchmark = this.getNodeParameter('benchmark', 0) as boolean;
-
-
 			let items;
 			let parameters;
 
 			try { // dataset : parameters
 				parameters = this.getInputData(0);
+				if (typeof parameters === 'undefined') throw new Error('');
 			}
 			catch(error) {
 				throw new Error('Dataset parameters are missing. Maybe you forgot to add a LdDatasetMain node before this one.');
 			}
 			try { // input file : items
 				items = this.getInputData(1);
+				if (typeof items === 'undefined') throw new Error('');
 			}
 			catch(error) {
 				throw new Error('Input File data are missing. Maybe you forgot to add a node before this one.');
 			}
 			// NB : si le dataset est manquant, les données iront dans la variable parameters, et le 2ème try/catch provoquera une erreur
 
-			const returnData: INodeExecutionData[] = [];
 			const length = items.length as unknown as number;
 			let item: INodeExecutionData;
 
 			console.log('** construction du résultat');
 
 			const urisJSON = [];
-
+			const usesBenchmark = this.getNodeParameter('benchmark', 0) as boolean;
 			for (let itemIndex = 0; itemIndex < length; itemIndex++) {
 				item = items[itemIndex];
 
 				const uri1 = item.json.resource1 as string;
 				const uri2 = item.json.resource2 as string;
-
-				const options = buildOptions(uri1, uri2, measureType);
-				const responseData = await this.helpers.request(options);
-
-
-				const score = (numberFormat === 'string') ? responseData.score.toString() as string : responseData.score as number;
-
 				if(usesBenchmark) {
 					urisJSON.push({
 						resource1: uri1,
@@ -341,45 +390,38 @@ export class LdSimilarity implements INodeType {
 					});
 				}
 
-				const newItem: INodeExecutionData = {
-					json: {
-						resource1: uri1,
-						resource2: uri2,
-						result: score,
-					},
-				};
-
-				returnData.push(newItem);
 			}
 
+			optionsUI.benchmark = usesBenchmark;
+			if(usesBenchmark) {
+				optionsUI.benchmarkName = this.getNodeParameter('benchmarkName',0) as string;
+				optionsUI.correlationType = this.getNodeParameter('correlationType',0) as string;
+			}
 
-			const optionsUI = {
-				benchmark: usesBenchmark,
-				threads: this.getNodeParameter('nbThreads', 0),
-				useIndex: this.getNodeParameter('useIndex', 0),
-				measureType: this.getNodeParameter('measureType', 0),
-			};
-
+			console.log(optionsUI);
 
 			const optionsPOST = buildOptionsPOST(urisJSON, parameters[0], optionsUI);
+			const responseData = await this.helpers.request(optionsPOST);
 
-
-			if(usesBenchmark === true) {
-				console.log('** utilisation du benchmark');
-				const correlationNumber = 0.5;
-				const correlation = (numberFormat === 'string') ? correlationNumber.toString() as string : correlationNumber as number;
-				const newItem: INodeExecutionData = {
-					json: {
-						resource1: 'Correlation',
-						resource2: '',
-						result: correlation,
-					},
-				};
-				returnData.push(newItem);
-			}
 			console.log('** fin du résultat');
 
-			return this.prepareOutputData(returnData);
+			console.log(optionsUI);
+
+			/* Traitement du résultat */
+
+			if(responseData.status === 'error') {
+				// cas erreur
+				throw new Error('Error ' + responseData.code + ' : ' + responseData.message);
+			}
+			else if(responseData.status === 'success') {
+				// cas succès
+				if(numberFormat === 'string') {
+					return this.prepareOutputData(setScoreToString(responseData.data));
+				}
+				else {
+					return this.prepareOutputData(responseData.data);
+				}
+			}
 
 		}
 
@@ -405,44 +447,43 @@ export class LdSimilarity implements INodeType {
 
 			console.log('** construction du résultat');
 
-			const uri1 = this.getNodeParameter('url1', 0) as string;
-			const uri2 = this.getNodeParameter('url2', 0) as string;
-
+			/* Construction des paramètres à envoyer à LDS */
 			const urisJSON = [{
-				resource1: uri1,
-				resource2: uri2,
+				resource1: this.getNodeParameter('url1', 0) as string,
+				resource2: this.getNodeParameter('url2', 0) as string,
 			}];
-			const optionsUI = {
-				benchmark: false,
-				threads: this.getNodeParameter('nbThreads', 0),
-				useIndex: this.getNodeParameter('useIndex', 0),
-				measureType: this.getNodeParameter('measureType', 0),
-			};
 
-
-			const options = buildOptions(uri1, uri2, measureType);
 			const optionsPOST = buildOptionsPOST(urisJSON, parameters[0], optionsUI);
-			const responseData = await this.helpers.request(options);
-			//const responseData = await this.helpers.request(optionsPOST);
+			const responseData = await this.helpers.request(optionsPOST);
 
-			const score = (numberFormat === 'string') ? responseData.score.toString() as string : responseData.score as number;
-
+			/* Traitement du résultat */
 			console.log('** fin du résultat');
+			if(responseData.status === 'error') {
+				// cas erreur
+				throw new Error('Error ' + responseData.code + ' : ' + responseData.message);
+			}
+			else if(responseData.status === 'success') {
+				// cas succès
+				const score = (numberFormat === 'string') ? responseData.data.score.toString() as string : responseData.score as number;
+				return [this.helpers.returnJsonArray(
+					{
+						resource1: responseData.data.resource1,
+						resource2: responseData.data.resource2,
+						'score' : score,
+					})];
+			}
 
-			return [this.helpers.returnJsonArray(
-				{
-					resource1: uri1,
-					resource2: uri2,
-					result : score,
-			})];
+
 		}
 
-
 		return [this.helpers.returnJsonArray({
-			resource1: measureType,
-			resource2: numberOfThreads,
-			result : 1,
+			resource1: 'missing',
+			resource2: 'missing',
+			score : 1,
 		})];
+
+
+
 
 
 
