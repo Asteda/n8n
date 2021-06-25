@@ -120,6 +120,9 @@ export class LdSimilarity implements INodeType {
 						benchmark: [
 							true,
 						],
+						resource: [
+							'file',
+						]	,
 					},
 				},
 				default: 'none',
@@ -146,6 +149,9 @@ export class LdSimilarity implements INodeType {
 						benchmark: [
 							true,
 						],
+						resource: [
+							'file',
+						]	,
 					},
 				},
 				default: 'spearman',
@@ -298,17 +304,9 @@ export class LdSimilarity implements INodeType {
 		 */
 		function buildOptionsPOST(resources: object[], dataset: INodeExecutionData, options: object): OptionsWithUri {
 
-			let url = 'https://wysiwym-api.herokuapp.com/similarity?' ;
-			if(resources.length > 1) {
-				url += 'mode=multiple';
-			}
-			else {
-				// @ts-ignore
-				url += 'mode=simple&res1=' + resources[0]['resource1'] + '&res2=' + resources[0]['resource1'];
-			}
 
 			const bodyOptions = {
-				'LdDatasetMain': dataset.json,
+				'ldDatasetMain': dataset.json,
 				'resources': resources,
 				'options': options,
 			} ;
@@ -319,7 +317,7 @@ export class LdSimilarity implements INodeType {
 				},
 				method: 'POST',
 				body: bodyOptions,
-				uri: url,
+				uri: 'https://wysiwym-api.herokuapp.com/similarity',
 				json: true,
 			};
 		}
@@ -393,7 +391,7 @@ export class LdSimilarity implements INodeType {
 			}
 
 			optionsUI.benchmark = usesBenchmark;
-			if(usesBenchmark) {
+			if(usesBenchmark === true) {
 				optionsUI.benchmarkName = this.getNodeParameter('benchmarkName',0) as string;
 				optionsUI.correlationType = this.getNodeParameter('correlationType',0) as string;
 			}
@@ -405,7 +403,7 @@ export class LdSimilarity implements INodeType {
 
 			console.log('** fin du résultat');
 
-			console.log(optionsUI);
+			console.log(optionsPOST);
 
 			/* Traitement du résultat */
 
@@ -415,18 +413,20 @@ export class LdSimilarity implements INodeType {
 			}
 			else if(responseData.status === 'success') {
 				// cas succès
+				console.log(responseData);
 				if(numberFormat === 'string') {
-					return this.prepareOutputData(setScoreToString(responseData.data));
+					return [this.helpers.returnJsonArray(setScoreToString(responseData.data))];
 				}
 				else {
-					return this.prepareOutputData(responseData.data);
+					//return this.prepareOutputData(responseData.data);
+					return [this.helpers.returnJsonArray(responseData.data)];
 				}
 			}
 
 		}
 
 
-		/* === partie pour les entrée en mode URIs === */
+		/* === partie pour les entrées en mode URIs === */
 
 		else if (resource === 'uris') {
 
@@ -454,6 +454,7 @@ export class LdSimilarity implements INodeType {
 			}];
 
 			const optionsPOST = buildOptionsPOST(urisJSON, parameters[0], optionsUI);
+			console.log(optionsPOST);
 			const responseData = await this.helpers.request(optionsPOST);
 
 			/* Traitement du résultat */
@@ -464,11 +465,11 @@ export class LdSimilarity implements INodeType {
 			}
 			else if(responseData.status === 'success') {
 				// cas succès
-				const score = (numberFormat === 'string') ? responseData.data.score.toString() as string : responseData.score as number;
+				const score = (numberFormat === 'string') ? (responseData.data[0].score).toString() as string : responseData.data[0].score as number;
 				return [this.helpers.returnJsonArray(
 					{
-						resource1: responseData.data.resource1,
-						resource2: responseData.data.resource2,
+						resource1: responseData.data[0].resource1,
+						resource2: responseData.data[0].resource2,
 						'score' : score,
 					})];
 			}
