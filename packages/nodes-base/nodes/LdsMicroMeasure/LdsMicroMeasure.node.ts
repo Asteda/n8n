@@ -138,8 +138,6 @@ export class LdsMicroMeasure implements INodeType {
 		const returnData = [];
 
 		if(usePreviousData === true) {
-			console.log('Utilisation de previousData');
-			console.log(previousData);
 			for(let i=0; i<previousData.length; i++) {
 				returnData.push({
 					resource1: previousData[i].json.resource1,

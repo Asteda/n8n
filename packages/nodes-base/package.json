@@ -413,6 +413,7 @@
       "dist/nodes/Kitemaker/Kitemaker.node.js",
       "dist/nodes/LdsDataset/LdsDataset.node.js",
       "dist/nodes/LdsMicroMeasure/LdsMicroMeasure.node.js",
+      "dist/nodes/LdsMicroMeasureAggregation/LdsMicroMeasureAggregation.node.js",
       "dist/nodes/LdsSimilarity/LdsSimilarity.node.js",
       "dist/nodes/Lemlist/Lemlist.node.js",
       "dist/nodes/Lemlist/LemlistTrigger.node.js",
