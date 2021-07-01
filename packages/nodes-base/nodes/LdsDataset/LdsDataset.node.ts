@@ -13,16 +13,16 @@ import {
 	OptionsWithUri,
 } from 'request';
 
-export class LdDatasetMain implements INodeType {
+export class LdsDataset implements INodeType {
 	description: INodeTypeDescription = {
-		displayName: 'LdDatasetMain',
-		name: 'ldDatasetMain',
+		displayName: 'LdsDataset',
+		name: 'ldsDataset',
 		icon: 'file:database-icon.svg',
 		group: ['transform'],
 		version: 1,
-		description: 'Consume LdSimilarity API',
+		description: 'Describe dataset for LdsSimilarity & LdsMicroMeasure',
 		defaults: {
-			name: 'LdDatasetMain',
+			name: 'LdsDataset',
 			color: '#1A82e2',
 		},
 		inputs: ['main'],

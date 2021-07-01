@@ -4,20 +4,20 @@ import {INodeExecutionData, INodeType, INodeTypeDescription,} from 'n8n-workflow
 
 import {OptionsWithUri,} from 'request';
 
-export class LdSimilarity implements INodeType {
+export class LdsSimilarity implements INodeType {
 	description: INodeTypeDescription = {
-		displayName: 'LdSimilarity',
-		name: 'ldSimilarity',
+		displayName: 'LdsSimilarity',
+		name: 'ldsSimilarity',
 		icon: 'file:gear-icon.svg',
 		group: ['transform'],
 		version: 1,
-		description: 'Consume LdSimilarity API',
+		description: 'Consume LdsSimilarity API',
 		defaults: {
-			name: 'LdSimilarity',
+			name: 'LdsSimilarity',
 			color: '#1A82e2',
 		},
 		inputs: ['main', 'main'],
-		inputNames: ['DatasetMain', 'Input File'],
+		inputNames: ['LdsDataset', 'Input File'],
 		outputs: ['main'],
 		credentials: [
 		],
