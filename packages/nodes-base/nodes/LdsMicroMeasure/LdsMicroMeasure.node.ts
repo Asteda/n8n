@@ -16,8 +16,8 @@ export class LdsMicroMeasure implements INodeType {
 			name: 'LdsMicroMeasure',
 			color: '#1A82e2',
 		},
-		inputs: ['main'],
-		inputNames: ['LdsDataset'],
+		inputs: ['main', 'main'],
+		inputNames: ['LdsDataset', 'LdsMicroMeasure'],
 		outputs: ['main'],
 		credentials: [
 		],
@@ -71,6 +71,20 @@ export class LdsMicroMeasure implements INodeType {
 			},
 
 			{
+				displayName: 'Weight',
+				name: 'weight',
+				type: 'number',
+				required: true,
+				typeOptions: {
+					maxValue: 1,
+					minValue: 0,
+					numberStepSize: 0.01,
+				},
+				default: 0.5,
+				description: 'Indicate the weight of this measure. This value acts like a coefficient.',
+			},
+
+			{
 				displayName: 'Output format for numbers',
 				name: 'format_numbers',
 				type: 'options',
@@ -97,11 +111,59 @@ export class LdsMicroMeasure implements INodeType {
 
 	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
 
-		return [this.helpers.returnJsonArray({
-			resource1: 'missing',
-			resource2: 'missing',
-			score : 1,
-		})];
+		// récupérer les valeurs entrées par l'utilisateur
+
+
+		// récupérer les valeurs en input et les sauvegarder pour les ajouter à la sortie
+
+		// tslint:disable-next-line:no-any
+		let previousData: string | any[] = [];
+		let parameters;
+		try { // dataset : parameters
+			parameters = this.getInputData(0);
+			if (typeof parameters === 'undefined') throw new Error('');
+		}
+		catch(error) {
+			throw new Error('Dataset parameters are missing. Maybe you forgot to add a LdsDataset node before this one.');
+		}
+		let usePreviousData=true;
+		try { // input file : items
+			previousData = this.getInputData(1);
+			if (typeof previousData === 'undefined') throw new Error('');
+		}
+		catch(error) {
+			usePreviousData=false;
+		}
+
+		const returnData = [];
+
+		if(usePreviousData === true) {
+			console.log('Utilisation de previousData');
+			console.log(previousData);
+			for(let i=0; i<previousData.length; i++) {
+				returnData.push({
+					resource1: previousData[i].json.resource1,
+					resource2: previousData[i].json.resource1,
+					score: previousData[i].json.score,
+					weight: previousData[i].json.weight,
+				});
+			}
+		}
+		returnData.push({
+			resource1: this.getNodeParameter('url1', 0) as string,
+			resource2: this.getNodeParameter('url2', 0) as string,
+			score: Math.random(),
+			weight: this.getNodeParameter('weight', 0) as number,
+		});
+
+
+		// calculer la valeur de similarité avec l'api LDS (requête POST)
+		// pour l'instant on renvoie une valeur aléatoire
+
+		// fusionner l'input et le résultat, puis faire la sortie
+
+
+		return [this.helpers.returnJsonArray(returnData)];
 
 
 	}
