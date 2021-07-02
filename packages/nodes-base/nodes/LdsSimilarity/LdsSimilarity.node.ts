@@ -266,6 +266,7 @@ export class LdsSimilarity implements INodeType {
 					{
 						name: 'String',
 						value: 'string',
+						description: 'This option can helps displaying the zeros values in Google Sheet.',
 					},
 				],
 				default: 'numeric',

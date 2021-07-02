@@ -11,6 +11,7 @@ export class LdsMicroMeasureAggregation implements INodeType {
 		icon: 'file:calculator.svg',
 		group: ['transform'],
 		version: 1,
+		subtitle: '={{$parameter["aggregation"]}}',
 		description: 'Aggregate values for LdsMicroMeasure',
 		defaults: {
 			name: 'LdsMicroMeasureAggregation',
