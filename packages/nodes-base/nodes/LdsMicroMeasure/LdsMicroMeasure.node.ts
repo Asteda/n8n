@@ -112,7 +112,7 @@ export class LdsMicroMeasure implements INodeType {
 	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
 
 		// récupérer les valeurs entrées par l'utilisateur
-
+		const formatString = this.getNodeParameter('format_numbers', 0) !== 'numeric';
 
 		// récupérer les valeurs en input et les sauvegarder pour les ajouter à la sortie
 
@@ -135,6 +135,36 @@ export class LdsMicroMeasure implements INodeType {
 			usePreviousData=false;
 		}
 
+		// calculer la valeur de similarité avec l'api LDS (requête POST)
+		// pour l'instant on renvoie une valeur aléatoire
+
+
+
+		const sendData = {
+			headers: {
+				'Accept': 'application/json',
+			},
+			method: 'POST',
+			body: {
+				'ldDatasetMain': parameters[0].json,
+				'resources': {
+					resource1: this.getNodeParameter('url1', 0) as string,
+					resource2: this.getNodeParameter('url2', 0) as string,
+					property: this.getNodeParameter('propertyName', 0) as string,
+				},
+				'options': {
+					weight: this.getNodeParameter('weight', 0) as number,
+					measureType: this.getNodeParameter('measure_atomic', 0) as string,
+				},
+			},
+			uri: 'https://wysiwym-api.herokuapp.com/microMeasure',
+			json: true,
+		};
+
+		//const responseData = await this.helpers.request(sendData);
+
+		// fusionner l'input et le résultat, puis faire la sortie
+
 		const returnData = [];
 
 		if(usePreviousData === true) {
@@ -147,21 +177,32 @@ export class LdsMicroMeasure implements INodeType {
 				});
 			}
 		}
+
+		/*if(responseData.status === 'error') {
+			throw new Error('Error ' + responseData.code + ' : ' + responseData.message);
+		}
+		else if (responseData.status === 'success') {
+			returnData.push({
+				resource1: this.getNodeParameter('url1', 0) as string,
+				resource2: this.getNodeParameter('url2', 0) as string,
+				score: (formatString) ? responseData.data.score as string : responseData.data.score as number,
+				weight: this.getNodeParameter('weight', 0) as number,
+			});
+
+		}*/
+
+		if(formatString) {
+			console.log('format string');
+		}
 		returnData.push({
 			resource1: this.getNodeParameter('url1', 0) as string,
 			resource2: this.getNodeParameter('url2', 0) as string,
-			score: Math.random(),
+			score: (formatString) ? Math.random().toString() : Math.random(),
 			weight: this.getNodeParameter('weight', 0) as number,
 		});
-
-
-		// calculer la valeur de similarité avec l'api LDS (requête POST)
-		// pour l'instant on renvoie une valeur aléatoire
-
-		// fusionner l'input et le résultat, puis faire la sortie
-
-
 		return [this.helpers.returnJsonArray(returnData)];
+
+
 
 
 	}

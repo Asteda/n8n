@@ -91,8 +91,12 @@ export class LdsMicroMeasureAggregation implements INodeType {
 		const valeurs: number[] = [];
 		const aggregtype = this.getNodeParameter('aggregation', 0) as string;
 		for(let i=0; i<previousData.length; i++) {
-			valeurs.push(previousData[i].json.score as number);
-
+			if(typeof previousData[i].json.score === 'string') {
+				valeurs.push(Number(previousData[i].json.score));
+			}
+			else {
+				valeurs.push(previousData[i].json.score as number);
+			}
 		}
 		switch(aggregtype) {
 			case 'min': value = findMin(valeurs); break;
