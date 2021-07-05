@@ -282,7 +282,7 @@ export class LdsSimilarity implements INodeType {
 
 	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
 
-		console.log('Exécution du noeud LdSimilarity');
+		//console.log('Exécution du noeud LdsSimilarity');
 
 
 		const resource = this.getNodeParameter('resource', 0) as string;
@@ -342,7 +342,7 @@ export class LdsSimilarity implements INodeType {
 		/* ===  partie pour les sources multiples (fichier contenant des couples d'URIs) === */
 
 		if(resource === 'file') {
-			console.log('** en mode File');
+			//console.log('** en mode File');
 
 			let items;
 			let parameters;
@@ -366,7 +366,7 @@ export class LdsSimilarity implements INodeType {
 			const length = items.length as unknown as number;
 			let item: INodeExecutionData;
 
-			console.log('** construction du résultat');
+			//console.log('** construction du résultat');
 
 			const urisJSON = [];
 			const usesBenchmark = this.getNodeParameter('benchmark', 0) as boolean;
@@ -397,14 +397,14 @@ export class LdsSimilarity implements INodeType {
 				optionsUI.correlationType = this.getNodeParameter('correlationType',0) as string;
 			}
 
-			console.log(optionsUI);
+			//console.log(optionsUI);
 
 			const optionsPOST = buildOptionsPOST(urisJSON, parameters[0], optionsUI);
 			const responseData = await this.helpers.request(optionsPOST);
 
-			console.log('** fin du résultat');
+			//console.log('** fin du résultat');
 
-			console.log(optionsPOST);
+			//console.log(optionsPOST);
 
 			/* Traitement du résultat */
 
@@ -414,7 +414,7 @@ export class LdsSimilarity implements INodeType {
 			}
 			else if(responseData.status === 'success') {
 				// cas succès
-				console.log(responseData);
+				//console.log(responseData);
 				if(numberFormat === 'string') {
 					return [this.helpers.returnJsonArray(setScoreToString(responseData.data))];
 				}
@@ -431,7 +431,7 @@ export class LdsSimilarity implements INodeType {
 
 		else if (resource === 'uris') {
 
-			console.log('** en mode URIs');
+			//console.log('** en mode URIs');
 
 			// ici nous n'attentons qu'une entrée en inputData
 
@@ -446,7 +446,7 @@ export class LdsSimilarity implements INodeType {
 				throw new Error('Dataset parameters invalid. Maybe you forgot to add a LdDatasetMain node before this one.');
 			}
 
-			console.log('** construction du résultat');
+			//console.log('** construction du résultat');
 
 			/* Construction des paramètres à envoyer à LDS */
 			const urisJSON = [{
@@ -455,11 +455,11 @@ export class LdsSimilarity implements INodeType {
 			}];
 
 			const optionsPOST = buildOptionsPOST(urisJSON, parameters[0], optionsUI);
-			console.log(optionsPOST);
+			//console.log(optionsPOST);
 			const responseData = await this.helpers.request(optionsPOST);
 
 			/* Traitement du résultat */
-			console.log('** fin du résultat');
+			//console.log('** fin du résultat');
 			if(responseData.status === 'error') {
 				// cas erreur
 				throw new Error('Error ' + responseData.code + ' : ' + responseData.message);
