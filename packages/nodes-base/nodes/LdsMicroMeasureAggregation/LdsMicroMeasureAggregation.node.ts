@@ -83,20 +83,27 @@ export class LdsMicroMeasureAggregation implements INodeType {
 		// tslint:disable-next-line:no-any
 		function findAvg(a: any[]) {
 			let avg=0;
-			for(let i=0; i<a.length; i++) avg += a[i];
+			for(let i=0; i<a.length; i++) avg += (a[i].value * a[i].weight);
 			avg /= a.length;
 			return avg;
 		}
 
 		let value=0;
-		const valeurs: number[] = [];
+		// tslint:disable-next-line:no-any
+		const valeurs: any[] = [];
 		const aggregtype = this.getNodeParameter('aggregation', 0) as string;
 		for(let i=0; i<previousData.length; i++) {
 			if(typeof previousData[i].json.score === 'string') {
-				valeurs.push(Number(previousData[i].json.score));
+				valeurs.push({
+					value: Number(previousData[i].json.score),
+					weight: previousData[i].json.weight as number,
+				});
 			}
 			else {
-				valeurs.push(previousData[i].json.score as number);
+				valeurs.push({
+					value: previousData[i].json.score as number,
+					weight: previousData[i].json.weight as number,
+				});
 			}
 		}
 		switch(aggregtype) {
