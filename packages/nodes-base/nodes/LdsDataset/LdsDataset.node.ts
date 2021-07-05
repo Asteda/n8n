@@ -20,6 +20,7 @@ export class LdsDataset implements INodeType {
 		icon: 'file:database-icon.svg',
 		group: ['transform'],
 		version: 1,
+		subtitle: '={{$parameter["datasetChoice"]}}',
 		description: 'Describe dataset for LdsSimilarity & LdsMicroMeasure',
 		defaults: {
 			name: 'LdsDataset',
@@ -128,7 +129,7 @@ export class LdsDataset implements INodeType {
 
 	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
 
-		console.log('Exécution du noeud LdDatasetMain');
+		//console.log('Exécution du noeud LdsDataset');
 		return [this.helpers.returnJsonArray({
 
 			name: this.getNodeParameter('datasetChoice', 0),
