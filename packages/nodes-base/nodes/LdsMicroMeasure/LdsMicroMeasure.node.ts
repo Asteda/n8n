@@ -58,6 +58,11 @@ export class LdsMicroMeasure implements INodeType {
 				type: 'options',
 				options: [
 					{
+						name: 'Integer',
+						value: 'int',
+						description: 'Compare two integers and get the difference in percentage.',
+					},
+					{
 						name: 'Levenshtein',
 						value: 'levenshtein',
 						description: 'The Levenshtein distance between two words is the minimum number of single-character edits (insertions, deletions or substitutions) required to change one word into the other.',
@@ -67,11 +72,11 @@ export class LdsMicroMeasure implements INodeType {
 						value: 'normalizedLevenshtein',
 						description: 'This distance is computed as levenshtein distance divided by the length of the longest string.',
 					},
-					{
+					/*{
 						name: 'Weighted Levenshtein',
 						value: 'weightedLevenshtein',
 						description: 'An implementation of Levenshtein that allows to define different weights for different character substitutions.',
-					},
+					},*/
 					{
 						name: 'Damerau-Levenshtein',
 						value: 'damerauLevenshtein',
@@ -211,11 +216,11 @@ export class LdsMicroMeasure implements INodeType {
 			method: 'POST',
 			body: {
 				'ldDatasetMain': parameters[0].json,
-				'resources': {
+				'resources': [{
 					resource1: this.getNodeParameter('url1', 0) as string,
 					resource2: this.getNodeParameter('url2', 0) as string,
 					property: this.getNodeParameter('propertyName', 0) as string,
-				},
+				}],
 				'options': {
 					weight: this.getNodeParameter('weight', 0) as number,
 					measureType: this.getNodeParameter('measure_atomic', 0) as string,
@@ -225,10 +230,13 @@ export class LdsMicroMeasure implements INodeType {
 			json: true,
 		};
 
-		//const responseData = await this.helpers.request(sendData);
+		console.log(sendData);
+
+		const responseData = await this.helpers.request(sendData);
 
 		// fusionner l'input et le résultat, puis faire la sortie
 
+		console.log(responseData);
 		const returnData = [];
 
 		if(usePreviousData === true) {
@@ -242,19 +250,20 @@ export class LdsMicroMeasure implements INodeType {
 			}
 		}
 
-		/*if(responseData.status === 'error') {
+		if(responseData.status === 'error') {
 			throw new Error('Error ' + responseData.code + ' : ' + responseData.message);
 		}
 		else if (responseData.status === 'success') {
 			returnData.push({
 				resource1: this.getNodeParameter('url1', 0) as string,
 				resource2: this.getNodeParameter('url2', 0) as string,
-				score: (formatString) ? responseData.data.score as string : responseData.data.score as number,
+				score: (formatString) ? responseData.data[0].score as string : responseData.data[0].score as number,
 				weight: this.getNodeParameter('weight', 0) as number,
 			});
 
-		}*/
+		}
 
+/*
 		if(formatString) {
 			console.log('format string');
 		}
@@ -263,7 +272,7 @@ export class LdsMicroMeasure implements INodeType {
 			resource2: this.getNodeParameter('url2', 0) as string,
 			score: (formatString) ? Math.random().toString() : Math.random(),
 			weight: this.getNodeParameter('weight', 0) as number,
-		});
+		});*/
 		return [this.helpers.returnJsonArray(returnData)];
 
 
