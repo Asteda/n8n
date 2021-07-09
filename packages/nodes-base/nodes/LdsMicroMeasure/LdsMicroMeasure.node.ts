@@ -230,20 +230,20 @@ export class LdsMicroMeasure implements INodeType {
 			json: true,
 		};
 
-		console.log(sendData);
+		//console.log(sendData);
 
 		const responseData = await this.helpers.request(sendData);
 
 		// fusionner l'input et le résultat, puis faire la sortie
 
-		console.log(responseData);
+		//log(responseData);
 		const returnData = [];
 
 		if(usePreviousData === true) {
 			for(let i=0; i<previousData.length; i++) {
 				returnData.push({
 					resource1: previousData[i].json.resource1,
-					resource2: previousData[i].json.resource1,
+					resource2: previousData[i].json.resource2,
 					score: previousData[i].json.score,
 					weight: previousData[i].json.weight,
 				});

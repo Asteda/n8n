@@ -70,20 +70,20 @@ export class LdsMicroMeasureAggregation implements INodeType {
 		// tslint:disable-next-line:no-any
 		function findMin(a: any[]) {
 			let min=a[0];
-			for(let i=0; i<a.length; i++) if(a[i] < min) min = a[i];
+			for(let i=0; i<a.length; i++) if(a[i] < min) min = a[i].value;
 			return min;
 		}
 		// tslint:disable-next-line:no-any
 		function findMax(a: any[]) {
 			let max=a[0];
-			for(let i=0; i<a.length; i++) if(a[i] > max) max = a[i];
+			for(let i=0; i<a.length; i++) if(a[i] > max) max = a[i].value;
 			return max;
 		}
 
 		// tslint:disable-next-line:no-any
 		function findAvg(a: any[]) {
 			let avg=0;
-			for(let i=0; i<a.length; i++) avg += (a[i].value * a[i].weight);
+			for(let i=0; i<a.length; i++) avg += (a[i].value);
 			avg /= a.length;
 			return avg;
 		}
