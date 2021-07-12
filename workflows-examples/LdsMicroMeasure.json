@@ -26,7 +26,7 @@
         "url1": "Paris",
         "url2": "Madrid",
         "propertyName": "populationMetro",
-        "measure_atomic": "int"
+        "measure_atomic": "numeric"
       },
       "name": "LdsMicroMeasure",
       "type": "n8n-nodes-base.ldsMicroMeasure",
@@ -41,7 +41,7 @@
         "url1": "Paris",
         "url2": "Madrid",
         "propertyName": "populationUrban",
-        "measure_atomic": "int"
+        "measure_atomic": "numeric"
       },
       "name": "LdsMicroMeasure1",
       "type": "n8n-nodes-base.ldsMicroMeasure",
