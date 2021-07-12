@@ -6,7 +6,26 @@ n8n is an extendable workflow automation tool. With a [fair-code](http://faircod
 
 <a href="https://raw.githubusercontent.com/n8n-io/n8n/master/assets/n8n-screenshot.png"><img src="https://raw.githubusercontent.com/n8n-io/n8n/master/assets/n8n-screenshot.png" width="550" alt="n8n.io - Screenshot"></a>
 
+## n8n for Linked Data Similarity library
 
+This fork is to use the [LDS Java Library (*Linked Data Similarity*)](https://github.com/FouadKom/lds). It provides 4 new nodes:
+
+- **LdsSimilarity**: calculate the semantic similarity between one or more pairs of concepts.
+- **LdsDataset**: configure the dataset (e.g. dbpedia).
+- **LdsMicroMeasure**: calculate the similarity between two properties of one pair of concepts.
+- **LdsMicroMeasureAggregation**: provides 3 types of aggregation function to apply on the results of the LdsMicroMeasure node.
+
+To use this repository:
+
+- Clone this repo using the git clone command.
+- Use a terminal and change the working directory into the root directory of this version of n8n.
+- Build the project:
+  - `lerna bootstrap --hoist && npm run build`
+- Run the project:
+  - `npm run dev` if you want to modify the source code (developement mode)
+  - `npm run start` otherwise.
+
+You can find some workflow examples [here](https://github.com/Asteda/n8n/tree/master/workflows-examples).
 
 ## Demo
 
