@@ -13,7 +13,7 @@ This fork is to use the [LDS Java Library (*Linked Data Similarity*)](https://gi
 - **LdsSimilarity**: calculate the semantic similarity between one or more pairs of concepts.
 - **LdsDataset**: configure the dataset (e.g. dbpedia).
 - **LdsMicroMeasure**: calculate the similarity between two properties of one pair of concepts.
-- **LdsMicroMeasureAggregation**: provides 3 types of aggregation function to apply on the results of the LdsMicroMeasure node.
+- **LdsMicroMeasureAggregation**: provides 3 types of aggregation function to apply on the results of the LdsMicroMeasure node (average, min, max).
 
 To use this repository:
 
@@ -22,7 +22,7 @@ To use this repository:
 - Build the project:
   - `lerna bootstrap --hoist && npm run build`
 - Run the project:
-  - `npm run dev` if you want to modify the source code (developement mode)
+  - `npm run dev` if you want to edit the source code (developement mode)
   - `npm run start` otherwise.
 
 You can find some workflow examples [here](https://github.com/Asteda/n8n/tree/master/workflows-examples).
