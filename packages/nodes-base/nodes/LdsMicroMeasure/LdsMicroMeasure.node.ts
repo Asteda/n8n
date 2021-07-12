@@ -58,9 +58,9 @@ export class LdsMicroMeasure implements INodeType {
 				type: 'options',
 				options: [
 					{
-						name: 'Integer',
+						name: 'Numeric',
 						value: 'int',
-						description: 'Compare two integers and get the difference in percentage.',
+						description: 'Compare two numbers and get the difference in percentage.',
 					},
 					{
 						name: 'Levenshtein',
