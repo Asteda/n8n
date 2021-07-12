@@ -205,8 +205,10 @@ export class LdsMicroMeasure implements INodeType {
 				returnData.push({
 					resource1: previousData[i].json.resource1,
 					resource2: previousData[i].json.resource2,
+					property: previousData[i].json.property,
 					score: previousData[i].json.score,
 					weight: previousData[i].json.weight,
+					result: previousData[i].json.result,
 				});
 			}
 		}
@@ -215,25 +217,18 @@ export class LdsMicroMeasure implements INodeType {
 			throw new Error('Error ' + responseData.code + ' : ' + responseData.message);
 		}
 		else if (responseData.status === 'success') {
+			const weight = this.getNodeParameter('weight', 0) as number;
 			returnData.push({
 				resource1: this.getNodeParameter('url1', 0) as string,
 				resource2: this.getNodeParameter('url2', 0) as string,
+				property: this.getNodeParameter('propertyName', 0) as string,
 				score: (formatString) ? responseData.data[0].score as string : responseData.data[0].score as number,
-				weight: this.getNodeParameter('weight', 0) as number,
+				'weight': weight,
+				result: (responseData.data[0].score * weight) as number,
 			});
 
 		}
 
-/*
-		if(formatString) {
-			console.log('format string');
-		}
-		returnData.push({
-			resource1: this.getNodeParameter('url1', 0) as string,
-			resource2: this.getNodeParameter('url2', 0) as string,
-			score: (formatString) ? Math.random().toString() : Math.random(),
-			weight: this.getNodeParameter('weight', 0) as number,
-		});*/
 		return [this.helpers.returnJsonArray(returnData)];
 
 

@@ -95,13 +95,15 @@ export class LdsMicroMeasureAggregation implements INodeType {
 		for(let i=0; i<previousData.length; i++) {
 			if(typeof previousData[i].json.score === 'string') {
 				valeurs.push({
-					value: Number(previousData[i].json.score),
+					score: Number(previousData[i].json.score),
+					value: Number(previousData[i].json.result),
 					weight: previousData[i].json.weight as number,
 				});
 			}
 			else {
 				valeurs.push({
-					value: previousData[i].json.score as number,
+					score: previousData[i].json.score as number,
+					value: previousData[i].json.result as number,
 					weight: previousData[i].json.weight as number,
 				});
 			}
@@ -113,7 +115,7 @@ export class LdsMicroMeasureAggregation implements INodeType {
 			default: value=0;
 		}
 		returnData.push({
-			'value': value,
+			'result': value,
 		});
 
 
