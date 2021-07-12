@@ -1,6 +1,12 @@
 import {IExecuteFunctions,} from 'n8n-core';
 
-import {INodeExecutionData, INodeType, INodeTypeDescription,} from 'n8n-workflow';
+import {
+	ILoadOptionsFunctions,
+	INodeExecutionData,
+	INodePropertyOptions,
+	INodeType,
+	INodeTypeDescription,
+} from 'n8n-workflow';
 
 import {OptionsWithUri,} from 'request';
 
@@ -56,83 +62,9 @@ export class LdsMicroMeasure implements INodeType {
 				displayName: 'Type of atomic measure',
 				name: 'measure_atomic',
 				type: 'options',
-				options: [
-					{
-						name: 'Numeric',
-						value: 'int',
-						description: 'Compare two numbers and get the difference in percentage.',
-					},
-					{
-						name: 'Levenshtein',
-						value: 'levenshtein',
-						description: 'The Levenshtein distance between two words is the minimum number of single-character edits (insertions, deletions or substitutions) required to change one word into the other.',
-					},
-					{
-						name: 'Normalized Levenshtein',
-						value: 'normalizedLevenshtein',
-						description: 'This distance is computed as levenshtein distance divided by the length of the longest string.',
-					},
-					/*{
-						name: 'Weighted Levenshtein',
-						value: 'weightedLevenshtein',
-						description: 'An implementation of Levenshtein that allows to define different weights for different character substitutions.',
-					},*/
-					{
-						name: 'Damerau-Levenshtein',
-						value: 'damerauLevenshtein',
-						description: 'Damerau-Levenshtein distance with transposition is the minimum number of operations needed to transform one string into the other, where an operation is defined as an insertion, deletion, or substitution of a single character, or a transposition of two adjacent characters.',
-					},
-					{
-						name: 'Optimal String Alignment',
-						value: 'optimalStringAligment',
-						description: 'Computes the number of edit operations needed to make the strings equal under the condition that no substring is edited more than once, whereas the true Damerau–Levenshtein presents no such restriction.',
-					},
-					{
-						name: 'Jaro-Winkler',
-						value: 'jaroWinkler',
-						description: 'The Jaro–Winkler distance metric is designed and best suited for short strings such as person names, and to detect typos.',
-					},
-					{
-						name: 'Longest Common Subsequence',
-						value: 'longestCommonSubsequence',
-						description: 'Consists in finding the longest subsequence common to two sequences. It differs from problems of finding common substrings: unlike substrings, subsequences are not required to occupy consecutive positions within the original sequences.',
-					},
-					{
-						name: 'Metric Longest Common Subsequence',
-						value: 'metricLongestCommonSubsequence',
-						description: 'Distance metric based on Longest Common Subsequence.',
-					},
-					{
-						name: 'N-Gram',
-						value: 'nGram',
-						description: 'The algorithm uses affixing with special character \'\\n\' to increase the weight of first characters. The normalization is achieved by dividing the total similarity score the original length of the longest word.',
-					},
-					{
-						name: 'Q-Gram',
-						value: 'qGram',
-						description: 'Approximate string-matching with q-grams and maximal matches',
-					},
-					{
-						name: 'Cosine similarity',
-						value: 'cosineSimilarity',
-						description: 'The similarity between the two strings is the cosine of the angle between these two vectors representation.',
-					},
-					{
-						name: 'Jaccard index',
-						value: 'jaccardIndex',
-						description: 'Metric distance. Like Q-Gram distance, the input strings are first converted into sets of n-grams, but this time the cardinality of each n-gram is not taken into account. Each input string is simply a set of n-grams.',
-					},
-					{
-						name: 'Sorensen-Dice coefficient',
-						value: 'sorensenDiceCoefficient',
-						description: 'Similar to Jaccard index.',
-					},
-					{
-						name: 'Ratcliff-Obershelp',
-						value: 'ratcliffObershelp',
-						description: 'Ratcliff-Obershelp Pattern Recognition is a string-matching algorithm for determining the similarity of two strings.',
-					},
-				],
+				typeOptions: {
+					loadOptionsMethod: 'getMeasures',
+				},
 				default: 'levenshtein',
 				description: 'Type of atomic measure to apply on the property',
 			},
@@ -176,6 +108,35 @@ export class LdsMicroMeasure implements INodeType {
 			},
 
 		],
+	};
+
+	methods = {
+		loadOptions: {
+			async getMeasures(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+				const returnData: INodePropertyOptions[] = [];
+
+				// @ts-ignore
+				const responseData = await this.helpers.request({
+					headers: {
+						'Accept': 'application/json',
+					},
+					method: 'POST',
+					body: {},
+					uri: 'https://wysiwym-api.herokuapp.com/getMicroMeasures',
+					json: true,
+				});
+
+				for(const option of responseData) {
+					returnData.push({
+						name: option.name,
+						value: option.attribute,
+						description: option.description,
+					});
+				}
+
+				return returnData;
+			},
+		},
 	};
 
 	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {

@@ -1,6 +1,12 @@
 import {IExecuteFunctions,} from 'n8n-core';
 
-import {INodeExecutionData, INodeType, INodeTypeDescription,} from 'n8n-workflow';
+import {
+	ILoadOptionsFunctions,
+	INodeExecutionData,
+	INodePropertyOptions,
+	INodeType,
+	INodeTypeDescription,
+} from 'n8n-workflow';
 
 import {OptionsWithUri,} from 'request';
 
@@ -187,72 +193,13 @@ export class LdsSimilarity implements INodeType {
 				displayName: 'Type of measure',
 				name: 'measureType',
 				type: 'options',
-				options: [ // les types sont parmi le tableau ici https://github.com/FouadKom/lds/blob/master/doc/Similarity_Measures_Configuration_Parameters.md
-					{
-						name: 'LDSD_d',
-						value: 'LDSD_d',
-					},
-					{
-						name: 'LDSD_dw',
-						value: 'LDSD_dw',
-					},
-					{
-						name: 'LDSD_i',
-						value: 'LDSD_i',
-					},
-					{
-						name: 'LDSD_iw',
-						value: 'LDSD_iw',
-					},
-					{
-						name: 'LDSD_cw',
-						value: 'LDSD_cw',
-					},
-					{
-						name: 'TLDSD',
-						value: 'TLDSD',
-					},
-					{
-						name: 'WLDSD',
-						value: 'WLDSD',
-					},
-					{
-						name: 'Resim',
-						value: 'Resim',
-					},
-					{
-						name: 'TResim',
-						value: 'TResim',
-					},
-					{
-						name: 'WResim',
-						value: 'WResim',
-					},
-					{
-						name: 'WTResim',
-						value: 'WTResim',
-					},
-					{
-						name: 'PICSS',
-						value: 'PICSS',
-					},
-					{
-						name: 'EPICS',
-						value: 'EPICS',
-					},
-					{
-						name: 'LODS (SimP submeasure)',
-						value: 'LODS-SimP',
-					},
-					{
-						name: 'LODS (SimI submeasure)',
-						value: 'LODS-SimI',
-					},
-
-				],
+				typeOptions: {
+					loadOptionsMethod: 'getMeasures',
+				},
 				default: 'Resim', // The initially selected option
 				description: 'Type of measure',
 			},
+
 
 			{
 				displayName: 'Output format for numbers',
@@ -278,6 +225,35 @@ export class LdsSimilarity implements INodeType {
 			},
 
 		],
+	};
+
+	methods = {
+		loadOptions: {
+			async getMeasures(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+				const returnData: INodePropertyOptions[] = [];
+
+				// @ts-ignore
+				const responseData = await this.helpers.request({
+					headers: {
+						'Accept': 'application/json',
+					},
+					method: 'POST',
+					body: {},
+					uri: 'https://wysiwym-api.herokuapp.com/getMeasures',
+					json: true,
+				});
+
+				for(const option of responseData) {
+					returnData.push({
+						name: option.name,
+						value: option.attribute,
+						description: option.description,
+					});
+				}
+
+				return returnData;
+			},
+		},
 	};
 
 	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
